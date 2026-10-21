@@ -1,0 +1,143 @@
+openapi: 3.1.0
+info:
+  title: Image Humanizer API
+  description: Transform generic AI image prompts into realistic, photography-grounded ones
+  version: 0.1.0
+servers:
+  - url: http://localhost:3001
+    description: Local server
+paths:
+  /api/transform:
+    post:
+      operationId: transformPrompt
+      summary: Transform a prompt
+      description: Transform a generic AI prompt into a realistic, photography-grounded one
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - prompt
+              properties:
+                prompt:
+                  type: string
+                  description: The image prompt to transform
+                style:
+                  type: string
+                  enum: [film, digital, phone]
+                  default: film
+                  description: Photography style
+                mood:
+                  type: string
+                  enum: [natural, moody, harsh]
+                  default: natural
+                  description: Lighting mood
+                imperfectionLevel:
+                  type: string
+                  enum: [low, medium, high]
+                  default: medium
+                  description: How many imperfections to add
+      responses:
+        '200':
+          description: Transformed prompt
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  original:
+                    type: string
+                  transformed:
+                    type: string
+                  originalScore:
+                    type: integer
+                  newScore:
+                    type: integer
+                  improvement:
+                    type: integer
+
+  /api/analyze:
+    post:
+      operationId: analyzePrompt
+      summary: Analyze a prompt
+      description: Analyze a prompt for AI-prone patterns without transforming
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - prompt
+              properties:
+                prompt:
+                  type: string
+                  description: The image prompt to analyze
+      responses:
+        '200':
+          description: Analysis results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  score:
+                    type: integer
+                    description: 0-100 score (higher = more AI-prone)
+                  badge:
+                    type: string
+                  issues:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        severity:
+                          type: string
+
+  /api/suggest:
+    post:
+      operationId: getSuggestions
+      summary: Get suggestions
+      description: Get suggestions for improving a prompt without auto-transforming
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - prompt
+              properties:
+                prompt:
+                  type: string
+      responses:
+        '200':
+          description: Suggestions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  issues:
+                    type: array
+                  score:
+                    type: integer
+                  recommendedAdditions:
+                    type: object
+
+  /api/modifiers:
+    get:
+      operationId: listModifiers
+      summary: List available modifiers
+      description: List all available realism modifiers by category
+      responses:
+        '200':
+          description: Modifiers by category
+          content:
+            application/json:
+              schema:
+                type: object
